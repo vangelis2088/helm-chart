@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-frontend
+  labels:
+    app: booking-frontend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: booking-frontend
+  template:
+    metadata:
+      labels:
+        app: booking-frontend
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+                fieldRef:
+                    fieldPath: metadata.namespace
+          - name: KUBERNETES_NODE_NAME
+            valueFrom:
+                fieldRef:
+                    fieldPath: spec.nodeName
